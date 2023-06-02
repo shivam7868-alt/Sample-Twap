@@ -63,6 +63,27 @@ contract PericeTest is Test {
         assertEq(averagePrice, 1423);
     }
 
+     function testQuery2() public {
+        addDataLessThanObservations();
+        uint256 averagePrice;
+        averagePrice = oracle.query(3);
+        assertEq(averagePrice, 800);
+
+        averagePrice = oracle.query(1);
+        assertEq(averagePrice, 900);
+        averagePrice = oracle.query(16);
+        assertEq(averagePrice, 583);
+    }
+
+    function addDataLessThanObservations() public {
+        oracle.addObservations(100);
+        oracle.addObservations(400);
+        oracle.addObservations(600);
+        oracle.addObservations(700);
+        oracle.addObservations(800);
+        oracle.addObservations(900);
+    }
+
     function testQuery_Revert() public {
         vm.expectRevert("DATA_NOT_STORED");
         oracle.query(67);

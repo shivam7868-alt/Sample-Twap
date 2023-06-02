@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity 0.8.19;
-
 import "forge-std/console.sol";
 
 contract PriceOracle {
@@ -19,20 +18,25 @@ contract PriceOracle {
         require(_observations <= 16, "DATA_NOT_STORED");
         uint8 givenObservations = _observations;
 
-        for (uint256 i = (pointer % 16) - 1; givenObservations > 0;) {
-            if (i == 0) {
+        if (pointer < _observations) {
+            for (uint8 i; i < pointer % 16; ++i) average += prices[i];
+            average /= pointer;
+        } else {
+            for (uint256 i = (pointer % 16) - 1; givenObservations > 0; ) {
+                if (i == 0) {
+                    average += prices[i];
+                    i = prices.length -1;
+                    --givenObservations;
+                    continue;
+                }
                 average += prices[i];
-                i = prices.length - 1;
-                --givenObservations;
-                continue;
+                unchecked {
+                    --i;
+                    --givenObservations;
+                }
             }
-            average += prices[i];
-            unchecked {
-                --i;
-                --givenObservations;
-            }
+            average /= _observations;
         }
-        average /= _observations;
     }
 
     function getPriceData() external view returns (uint256[] memory) {
